@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
 import { NextFunction, Request, Response } from 'express';
 
@@ -15,9 +17,10 @@ const createStudent = async (
       studentData,
     );
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
       success: true,
-      message: 'Student is created succesfully',
+      message: 'Student is created successfully',
       data: result,
     });
   } catch (err) {
