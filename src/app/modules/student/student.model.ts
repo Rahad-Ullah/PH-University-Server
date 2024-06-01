@@ -86,6 +86,10 @@ const studentSchema = new Schema<TStudent>({
   guardian: guardianSchema,
   localGuardian: localGuradianSchema,
   profileImg: { type: String },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 export const StudentModel = model<TStudent>('Student', studentSchema);
