@@ -77,7 +77,7 @@ const studentSchema = new Schema<TStudent>({
   name: userNameSchema,
   gender: ['male', 'female'],
   dateOfBirth: { type: Date },
-  email: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   contactNo: { type: String, required: true },
   emergencyContactNo: { type: String, required: true },
   bloogGroup: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
@@ -86,10 +86,14 @@ const studentSchema = new Schema<TStudent>({
   guardian: guardianSchema,
   localGuardian: localGuradianSchema,
   profileImg: { type: String },
+  admissionSemester: {
+    type: Schema.Types.ObjectId,
+    ref: 'AcademicSemester',
+  },
   isDeleted: {
     type: Boolean,
     default: false,
-  }
+  },
 });
 
 export const StudentModel = model<TStudent>('Student', studentSchema);
