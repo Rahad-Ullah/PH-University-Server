@@ -18,7 +18,7 @@ const getAcademicFacultyFromDB = async (id: string) => {
   return result;
 };
 
-// retrieve single academic semester
+// update single academic semester
 const updateAcademicFacultyIntoDB = async (
   facultyId: string,
   payload: Partial<TAcademicFaculty>,
