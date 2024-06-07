@@ -61,6 +61,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     // if catched any error, abort and rollback transaction
     await session.abortTransaction();
     await session.endSession();
+    throw new AppError(httpStatus.NOT_FOUND, 'Failed to create student')
   }
 };
 
