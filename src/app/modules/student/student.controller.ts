@@ -7,7 +7,7 @@ import catchAsync from '../../utils/catchAsync';
 
 // Higher Order Function --> to simplify code. Avoid repeatation of TryCatch function, use CatchAsync
 const getAllStudents = catchAsync(async (req, res) => {
-  const result = await StudentServices.getAllStudentsFromDB();
+  const result = await StudentServices.getAllStudentsFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
