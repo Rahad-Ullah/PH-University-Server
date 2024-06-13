@@ -4,7 +4,6 @@ import { TCourse, TPreRequisiteCourses } from './course.interface';
 const preRequisiteCoursesSchema = new Schema<TPreRequisiteCourses>({
   course: {
     type: Schema.Types.ObjectId,
-    required: true,
   },
   isDeleted: {
     type: Boolean,
