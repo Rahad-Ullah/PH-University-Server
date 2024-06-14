@@ -11,7 +11,9 @@ const createCourseValidationSchema = z.object({
     prefix: z.string().min(1),
     code: z.number().min(1),
     credits: z.number().min(1),
-    preRequisiteCourses: z.array(preRequisiteCoursesValidationSchema),
+    preRequisiteCourses: z
+      .array(preRequisiteCoursesValidationSchema)
+      .optional(),
   }),
 });
 
