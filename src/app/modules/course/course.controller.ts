@@ -70,7 +70,7 @@ const deleteCourse: RequestHandler = catchAsync(async (req, res) => {
 export const CourseControllers = {
   createCourse,
   getAllCourses,
-  getCourse: getSingleCourse,
+  getSingleCourse,
   updateCourse,
   deleteCourse,
 };
