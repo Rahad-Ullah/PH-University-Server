@@ -54,7 +54,7 @@ const updateCourse: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-// update single course
+// delete single course
 const deleteCourse: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await courseServices.deleteCourseFromDB(id);
