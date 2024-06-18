@@ -76,7 +76,7 @@ const getAllFacultysFromDB = async (query: Record<string, unknown>) => {
 
   const facultyQuery = new QueryBuilder(
     Faculty.find()
-      .populate('admissionSemester')
+      .populate('academicFaculty')
       .populate({
         path: 'academicDepartment',
         populate: {
@@ -97,8 +97,8 @@ const getAllFacultysFromDB = async (query: Record<string, unknown>) => {
 
 // retrieve single Faculty
 const getSingleFacultyFromDB = async (id: string) => {
-  const result = await Faculty.findOne({ id })
-    .populate('admissionSemester')
+  const result = await Faculty.findById(id)
+    .populate('academicFaculty')
     .populate({
       path: 'academicDepartment',
       populate: {
@@ -108,7 +108,7 @@ const getSingleFacultyFromDB = async (id: string) => {
   return result;
 };
 
-// retrieve single Faculty
+// update single Faculty
 const updateFacultyIntoDB = async (id: string, payload: Partial<TFaculty>) => {
   const { name, ...remainingFacultyData } = payload;
 
@@ -122,20 +122,8 @@ const updateFacultyIntoDB = async (id: string, payload: Partial<TFaculty>) => {
     }
   }
 
-//   if (guardian && Object.keys(guardian).length) {
-//     for (const [key, value] of Object.entries(guardian)) {
-//       modifiedUpdatedData[`guardian.${key}`] = value;
-//     }
-//   }
-
-//   if (localGuardian && Object.keys(localGuardian).length) {
-//     for (const [key, value] of Object.entries(localGuardian)) {
-//       modifiedUpdatedData[`localGuardian.${key}`] = value;
-//     }
-//   }
-
-  const result = await Faculty.findOneAndUpdate(
-    { id },
+  const result = await Faculty.findByIdAndUpdate(
+    id,
     modifiedUpdatedData,
     { new: true, runValidators: true },
   );
@@ -152,8 +140,8 @@ const deleteSingleFacultyFromDB = async (id: string) => {
     // start transaction
     session.startTransaction();
 
-    const deletedFaculty = await Faculty.findOneAndUpdate(
-      { id },
+    const deletedFaculty = await Faculty.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     );
@@ -162,8 +150,8 @@ const deleteSingleFacultyFromDB = async (id: string) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Faculty');
     }
 
-    const deletedUser = await User.findOneAndUpdate(
-      { id },
+    const deletedUser = await User.findByIdAndUpdate(
+      deletedFaculty.user,
       { isDeleted: true },
       { new: true, session },
     );
@@ -171,6 +159,7 @@ const deleteSingleFacultyFromDB = async (id: string) => {
     if (!deletedUser) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
     }
+    console.log(deletedUser);
 
     await session.commitTransaction();
     await session.endSession();
