@@ -5,19 +5,20 @@ import { SemesterRegistrationValidations } from './semesterRegistration.validati
 
 const router = express.Router();
 
+// crete new semester registration
 router.post(
   '/create-semester-registration',
   validateRequest(SemesterRegistrationValidations.createSemesterRegistrationValidationSchema),
   SemesterRegistrationControllers.createSemesterRegistration,
 );
 
+// get all semester registration
 router.get('/', SemesterRegistrationControllers.getAllSemesterRegistration);
 
+// get single semester registration
 router.get('/:id', SemesterRegistrationControllers.getSingleSemesterRegistration);
 
-// assign faculties
-// router.put('/:courseId/assign-faculties', validateRequest(CourseValidations.facultiesWithCourseValidationSchema),  SemesterRegistrationControllers.assignFacultiesWithCourse)
-
+// update semester registration
 router.patch(
   '/:id',
   validateRequest(SemesterRegistrationValidations.updateSemesterRegistrationValidationSchema),

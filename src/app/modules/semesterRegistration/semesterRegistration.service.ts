@@ -12,6 +12,15 @@ const createSemesterRegistrationIntoDB = async (
 ) => {
   const academicSemester = payload?.academicSemester;
 
+  // check if there any registered semester that is already 'UPCOMING' | 'ONGOING'
+  const isAnyUpcomingOrOngoingSemester = await SemesterRegistration.findOne({
+    $or: [{status: 'UPCOMING'}, {status: 'ONGOING'}]
+  });
+
+  if(isAnyUpcomingOrOngoingSemester){
+    throw new AppError(httpStatus.BAD_REQUEST, `There is already a ${isAnyUpcomingOrOngoingSemester.status} registered semester`)
+  }
+
   // check if this semester exists
   const isSemesterExists = await AcademicSemester.findById(academicSemester);
 
@@ -52,7 +61,8 @@ const getAllSemesterRegistrationFromDB = async (
 };
 
 const getSingleSemesterRegistrationFromDB = async (id: string) => {
-  const result = await SemesterRegistration.findById(id).populate('academicSemester');
+  const result =
+    await SemesterRegistration.findById(id).populate('academicSemester');
   return result;
 };
 
@@ -61,88 +71,22 @@ const updateSemesterRegistrationIntoDB = async (
   id: string,
   payload: Partial<TSemesterRegistration>,
 ) => {
-  // const { preRequisiteCourses, ...courseRemainingData } = payload;
-  // const session = await mongoose.startSession();
-  // try {
-  //   session.startTransaction();
-  //   // step-1: basic course info update
-  //   const updatedBasicCourseInfo = await Course.findByIdAndUpdate(
-  //     id,
-  //     courseRemainingData,
-  //     { new: true, runValidators: true, session },
-  //   );
-  //   if (!updatedBasicCourseInfo) {
-  //     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
-  //   }
-  //   if (preRequisiteCourses && preRequisiteCourses.length > 0) {
-  //     // filter out the deleted fields
-  //     const deletedPreRequisites = preRequisiteCourses
-  //       .filter((el) => el.course && el.isDeleted)
-  //       .map((el) => el.course);
-  //     const deletedPreRequisitesCourses = await Course.findByIdAndUpdate(
-  //       id,
-  //       {
-  //         $pull: {
-  //           preRequisiteCourses: { course: { $in: deletedPreRequisites } },
-  //         },
-  //       },
-  //       { new: true, runValidators: true, session },
-  //     );
-  //     if (!deletedPreRequisitesCourses) {
-  //       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
-  //     }
-  //     // filter out the new course fields
-  //     const newPreRequisites = preRequisiteCourses?.filter(
-  //       (el) => el.course && !el.isDeleted,
-  //     );
-  //     const newPreRequisitesCourses = await Course.findByIdAndUpdate(
-  //       id,
-  //       {
-  //         $addToSet: { preRequisiteCourses: { $each: newPreRequisites } },
-  //       },
-  //       { new: true, runValidators: true, session },
-  //     );
-  //     if (!newPreRequisitesCourses) {
-  //       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
-  //     }
-  //     const result = await Course.findById(id).populate(
-  //       'preRequisiteCourses.course',
-  //     );
-  //     return result;
-  //   }
-  //   await session.commitTransaction();
-  //   await session.endSession();
-  // } catch (error) {
-  //   await session.abortTransaction();
-  //   await session.endSession();
-  //   throw new Error('Failed to update');
-  // }
+  // if the requested semester is exists
+  const isSemesterRegistrationExists = await SemesterRegistration.findById(id)
+
+  if(!isSemesterRegistrationExists){
+    throw new AppError(httpStatus.NOT_FOUND, 'The semester is not found!')
+  }
+  
+  // if the requested semester registration is ended, we will not update anything
+  const currentSemesterStatus = isSemesterRegistrationExists?.status
+
+  if(currentSemesterStatus === 'ENDED'){
+    throw new AppError(httpStatus.BAD_REQUEST, `This semester is already ${currentSemesterStatus}`)
+  }
+
+
 };
-
-// // assign faculties
-// const assignFacultiesIntoDB = async (id: string, payload: Partial<TCourseFaculty>) => {
-//   const result = await CourseFaculty.findByIdAndUpdate(id, {
-//     course: id,
-//     $addToSet: {faculties: {$each: payload}}
-//   }, {
-//     upsert: true,
-//     new: true
-//   })
-
-//   return result;
-// };
-
-// // remove faculties
-// const removeFacultiesIntoDB = async (id: string, payload: Partial<TCourseFaculty>) => {
-//   const result = await CourseFaculty.findByIdAndUpdate(id, {
-//     $pull: {faculties: {$in: payload}}
-//   }, {
-//     upsert: true,
-//     new: true
-//   })
-
-//   return result;
-// };
 
 export const SemesterRegistrationServices = {
   createSemesterRegistrationIntoDB,
