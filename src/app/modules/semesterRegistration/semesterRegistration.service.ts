@@ -4,9 +4,27 @@ import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { TSemesterRegistration } from './semesterRegistration.interface';
 import { SemesterRegistration } from './semesterRegistration.model';
+import { AcademicSemester } from '../academicSemester/academicSemester.model';
 
 // create new semester registration
 const createSemesterRegistrationIntoDB = async (payload: TSemesterRegistration) => {
+
+  const academicSemester = payload?.academicSemester;
+
+  // check if this semester exists
+  const isSemesterExists = await AcademicSemester.findById(academicSemester)
+  
+  if(!isSemesterExists){
+    throw new AppError(httpStatus.NOT_FOUND, 'This semester is not fount!')
+  }
+
+  // check if this semester already regestered
+  const isSemesterRegestered = await SemesterRegistration.findOne({academicSemester})
+
+  if(isSemesterRegestered){
+    throw new AppError(httpStatus.CONFLICT, 'The semester is already registered!')
+  }
+  
   const result = await SemesterRegistration.create(payload);
   return result;
 };

@@ -1,27 +1,26 @@
-import { z } from 'zod';
+import { string, z } from 'zod';
+import { semesterRegistrationStatus } from './semesterRegistration.constant';
 
 const createSemesterRegistrationValidationSchema = z.object({
   body: z.object({
     academicSemester: z.string(),
-    status: z.enum(['UPCOMING', 'ONGOING', 'ENDED']),
-    startDate: z.string(),
-    endDate: z.string(),
-    startTime: z.string(),
-    endTime: z.string(),
+    status: z.enum([...(semesterRegistrationStatus as [string, ...string[]])]),
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime(),
+    minCredit: z.number(),
+    maxCredit: z.number(),
   }),
-  isDeleted: z.boolean().optional(),
 });
 
 const updateSemesterRegistrationValidationSchema = z.object({
   body: z.object({
     academicSemester: z.string().optional(),
-    status: z.enum(['UPCOMING', 'ONGOING', 'ENDED']).optional(),
-    startDate: z.string().optional(),
-    endDate: z.string().optional(),
-    startTime: z.string().optional(),
-    endTime: z.string().optional(),
+    status: z.enum([...(semesterRegistrationStatus as [string, ...string[]])]).optional(),
+    startDate: z.string().datetime().optional(),
+    endDate: z.string().datetime().optional(),
+    minCredit: z.number().optional(),
+    maxCredit: z.number().optional(),
   }),
-  isDeleted: z.boolean().optional(),
 });
 
 export const SemesterRegistrationValidations = {

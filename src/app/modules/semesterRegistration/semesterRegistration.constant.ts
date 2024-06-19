@@ -1,1 +1,5 @@
-export const courseSearchableFields = ['title', 'prefix', 'code'];
+export const semesterRegistrationStatus = [
+    'UPCOMING',
+    'ONGOING',
+    'ENDED'
+]
