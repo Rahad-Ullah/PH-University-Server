@@ -1,153 +1,136 @@
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { courseSearchableFields } from './course.constant';
-import { TCourse, TCourseFaculty } from './course.interface';
-import { Course, CourseFaculty } from './course.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
-import { CourseRoutes } from './course.route';
+import { TSemesterRegistration } from './semesterRegistration.interface';
+import { SemesterRegistration } from './semesterRegistration.model';
 
-// create new course
-const createCourseIntoDB = async (payload: TCourse) => {
-  const result = await Course.create(payload);
+// create new semester registration
+const createSemesterRegistrationIntoDB = async (payload: TSemesterRegistration) => {
+  const result = await SemesterRegistration.create(payload);
   return result;
 };
 
-// get all course
-const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
-  const courseQuery = new QueryBuilder(
-    Course.find().populate('preRequisiteCourses.course'),
-    query,
-  )
-    .search(courseSearchableFields)
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
-  const result = await courseQuery.modelQuery;
-  return result;
+// get all semester registration
+const getAllSemesterRegistrationFromDB = async (query: Record<string, unknown>) => {
+  // const semesterRegistrationQuery = new QueryBuilder(
+  //   SemesterRegistration.find(),
+  //   query,
+  // )
+  //   .search(courseSearchableFields)
+  //   .filter()
+  //   .sort()
+  //   .paginate()
+  //   .fields();
+  // const result = await courseQuery.modelQuery;
+  // return result;
 };
 
-const getSingleCourseFromDB = async (id: string) => {
-  const result = await Course.findById(id).populate(
-    'preRequisiteCourses.course',
-  );
+const getSingleSemesterRegistrationFromDB = async (id: string) => {
+  const result = await SemesterRegistration.findById(id);
   return result;
 };
 
 // update course with transaction
-const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
-  const { preRequisiteCourses, ...courseRemainingData } = payload;
+const updateSemesterRegistrationIntoDB = async (id: string, payload: Partial<TSemesterRegistration>) => {
+  // const { preRequisiteCourses, ...courseRemainingData } = payload;
 
-  const session = await mongoose.startSession();
+  // const session = await mongoose.startSession();
 
-  try {
-    session.startTransaction();
+  // try {
+  //   session.startTransaction();
 
-    // step-1: basic course info update
-    const updatedBasicCourseInfo = await Course.findByIdAndUpdate(
-      id,
-      courseRemainingData,
-      { new: true, runValidators: true, session },
-    );
+  //   // step-1: basic course info update
+  //   const updatedBasicCourseInfo = await Course.findByIdAndUpdate(
+  //     id,
+  //     courseRemainingData,
+  //     { new: true, runValidators: true, session },
+  //   );
 
-    if (!updatedBasicCourseInfo) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
-    }
+  //   if (!updatedBasicCourseInfo) {
+  //     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+  //   }
 
-    if (preRequisiteCourses && preRequisiteCourses.length > 0) {
-      // filter out the deleted fields
-      const deletedPreRequisites = preRequisiteCourses
-        .filter((el) => el.course && el.isDeleted)
-        .map((el) => el.course);
+  //   if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+  //     // filter out the deleted fields
+  //     const deletedPreRequisites = preRequisiteCourses
+  //       .filter((el) => el.course && el.isDeleted)
+  //       .map((el) => el.course);
 
-      const deletedPreRequisitesCourses = await Course.findByIdAndUpdate(
-        id,
-        {
-          $pull: {
-            preRequisiteCourses: { course: { $in: deletedPreRequisites } },
-          },
-        },
-        { new: true, runValidators: true, session },
-      );
+  //     const deletedPreRequisitesCourses = await Course.findByIdAndUpdate(
+  //       id,
+  //       {
+  //         $pull: {
+  //           preRequisiteCourses: { course: { $in: deletedPreRequisites } },
+  //         },
+  //       },
+  //       { new: true, runValidators: true, session },
+  //     );
 
-      if (!deletedPreRequisitesCourses) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
-      }
+  //     if (!deletedPreRequisitesCourses) {
+  //       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+  //     }
 
-      // filter out the new course fields
-      const newPreRequisites = preRequisiteCourses?.filter(
-        (el) => el.course && !el.isDeleted,
-      );
+  //     // filter out the new course fields
+  //     const newPreRequisites = preRequisiteCourses?.filter(
+  //       (el) => el.course && !el.isDeleted,
+  //     );
 
-      const newPreRequisitesCourses = await Course.findByIdAndUpdate(
-        id,
-        {
-          $addToSet: { preRequisiteCourses: { $each: newPreRequisites } },
-        },
-        { new: true, runValidators: true, session },
-      );
+  //     const newPreRequisitesCourses = await Course.findByIdAndUpdate(
+  //       id,
+  //       {
+  //         $addToSet: { preRequisiteCourses: { $each: newPreRequisites } },
+  //       },
+  //       { new: true, runValidators: true, session },
+  //     );
 
-      if (!newPreRequisitesCourses) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
-      }
+  //     if (!newPreRequisitesCourses) {
+  //       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+  //     }
 
-      const result = await Course.findById(id).populate(
-        'preRequisiteCourses.course',
-      );
-      return result;
-    }
+  //     const result = await Course.findById(id).populate(
+  //       'preRequisiteCourses.course',
+  //     );
+  //     return result;
+  //   }
 
-    await session.commitTransaction();
-    await session.endSession();
-  } catch (error) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw new Error('Failed to update');
-  }
+  //   await session.commitTransaction();
+  //   await session.endSession();
+  // } catch (error) {
+  //   await session.abortTransaction();
+  //   await session.endSession();
+  //   throw new Error('Failed to update');
+  // }
 };
 
-// delete course
-const deleteCourseFromDB = async (id: string) => {
-  const result = await Course.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true },
-  );
-  return result;
-};
-
-// assign faculties
-const assignFacultiesIntoDB = async (id: string, payload: Partial<TCourseFaculty>) => {
-  const result = await CourseFaculty.findByIdAndUpdate(id, {
-    course: id,
-    $addToSet: {faculties: {$each: payload}}
-  }, {
-    upsert: true, 
-    new: true
-  })
+// // assign faculties
+// const assignFacultiesIntoDB = async (id: string, payload: Partial<TCourseFaculty>) => {
+//   const result = await CourseFaculty.findByIdAndUpdate(id, {
+//     course: id,
+//     $addToSet: {faculties: {$each: payload}}
+//   }, {
+//     upsert: true, 
+//     new: true
+//   })
   
-  return result;
-};
+//   return result;
+// };
 
-// remove faculties
-const removeFacultiesIntoDB = async (id: string, payload: Partial<TCourseFaculty>) => {
-  const result = await CourseFaculty.findByIdAndUpdate(id, {
-    $pull: {faculties: {$in: payload}}
-  }, {
-    upsert: true, 
-    new: true
-  })
+// // remove faculties
+// const removeFacultiesIntoDB = async (id: string, payload: Partial<TCourseFaculty>) => {
+//   const result = await CourseFaculty.findByIdAndUpdate(id, {
+//     $pull: {faculties: {$in: payload}}
+//   }, {
+//     upsert: true, 
+//     new: true
+//   })
   
-  return result;
-};
+//   return result;
+// };
 
-export const courseServices = {
-  createCourseIntoDB,
-  getAllCoursesFromDB,
-  getSingleCourseFromDB,
-  updateCourseIntoDB,
-  deleteCourseFromDB,
-  assignFacultiesIntoDB,
-  removeFacultiesIntoDB,
+export const SemesterRegistrationServices = {
+  createSemesterRegistrationIntoDB,
+  getAllSemesterRegistrationFromDB,
+  getSingleSemesterRegistrationFromDB,
+  updateSemesterRegistrationIntoDB,
 };

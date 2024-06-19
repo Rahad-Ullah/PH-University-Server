@@ -1,32 +1,26 @@
 import express from 'express';
-import { CourseValidations } from './course.validation';
 import validateRequest from '../../middlewares/validateRequest';
-import { CourseControllers } from './course.controller';
+import { SemesterRegistrationControllers } from './semesterRegistration.controller';
 
 const router = express.Router();
 
 router.post(
   '/create-course',
   validateRequest(CourseValidations.createCourseValidationSchema),
-  CourseControllers.createCourse,
+  SemesterRegistrationControllers.createSemesterRegistration,
 );
 
-router.get('/', CourseControllers.getAllCourses);
+router.get('/', SemesterRegistrationControllers.getAllSemesterRegistration);
 
-router.get('/:id', CourseControllers.getSingleCourse);
-
-router.delete('/:id', CourseControllers.deleteCourse);
+router.get('/:id', SemesterRegistrationControllers.getSingleSemesterRegistration);
 
 // assign faculties
-router.put('/:courseId/assign-faculties', validateRequest(CourseValidations.facultiesWithCourseValidationSchema),  CourseControllers.assignFacultiesWithCourse)
-
-// remove faculties from a course
-router.delete('/:courseId/remove-faculties', validateRequest(CourseValidations.facultiesWithCourseValidationSchema),  CourseControllers.removeFacultiesWithCourse)
+// router.put('/:courseId/assign-faculties', validateRequest(CourseValidations.facultiesWithCourseValidationSchema),  SemesterRegistrationControllers.assignFacultiesWithCourse)
 
 router.patch(
   '/:id',
   validateRequest(CourseValidations.updateCourseValidationSchema),
-  CourseControllers.updateCourse,
+  SemesterRegistrationControllers.updateSemesterRegistration,
 );
 
-export const CourseRoutes = router;
+export const SemesterRegistrationRoutes = router;
