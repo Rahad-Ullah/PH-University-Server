@@ -35,7 +35,10 @@ const updateFaculty = catchAsync(async (req, res) => {
   const { facultyId } = req.params;
   const { faculty: facultyData } = req.body;
 
-  const result = await FacultyServices.updateFacultyIntoDB(facultyId, facultyData);
+  const result = await FacultyServices.updateFacultyIntoDB(
+    facultyId,
+    facultyData,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
