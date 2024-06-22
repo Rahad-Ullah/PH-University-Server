@@ -5,7 +5,6 @@ import { TCourse, TCourseFaculty } from './course.interface';
 import { Course, CourseFaculty } from './course.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
-import { CourseRoutes } from './course.route';
 
 // create new course
 const createCourseIntoDB = async (payload: TCourse) => {
