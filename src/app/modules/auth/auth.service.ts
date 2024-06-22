@@ -73,7 +73,7 @@ const changePassword = async (
 
   // checking if the password is valid
   if (!(await User.isPasswordMatched(payload?.oldPassword, user?.password))) {
-    throw new AppError(httpStatus.FORBIDDEN, 'Password does not matched');
+    throw new AppError(httpStatus.FORBIDDEN, 'Old password does not matched');
   }
 
   // hash new password
@@ -90,6 +90,7 @@ const changePassword = async (
     {
       password: newHashedPassword,
       needPasswordChange: false,
+      passwordChangedAt: new Date(),
     },
   );
   return result;
